@@ -1,4 +1,5 @@
 import sys
+import os
 import sqlite3
 
 # Function to get table schema
@@ -8,7 +9,7 @@ def get_table_schema(cursor, table_name):
 
 # Function to generate a class with CRUD methods for a table
 def generate_class_for_table(table_name, schema):
-    class_definition = f"class {table_name.capitalize()}CRUD:\n"
+    class_definition = f"class Crud_{table_name.capitalize()}:\n"
     class_definition += "    def __init__(self, connection):\n"
     class_definition += "        self.conn = connection\n"
     class_definition += "        self.cursor = self.conn.cursor()\n\n"
@@ -66,7 +67,7 @@ def generate_crud_classes(db_name):
 
 # Call the function with the database name
 if __name__ == "__main__":
-  if len(sys.argv) < 1:
+  if len(sys.argv) <= 1:
     print("Please specify the database name like so: ./crud-generate.py [example.sqlite3]")
     exit(1)
   # Generate the classes
