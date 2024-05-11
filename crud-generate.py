@@ -48,7 +48,7 @@ def generate_crud_classes(db_name):
     tables = cursor.fetchall()
     
     # Start writing to the output file
-    with open(os.path.splitext(os.path.basename(db_name))[0]+"_crud.py, 'w') as file:
+    with open(os.path.splitext(os.path.basename(db_name))[0]+"_crud.py", 'w') as file:
         file.write("import sqlite3\n\n")
         file.write(f"conn = sqlite3.connect('{db_name}')\n\n")
         
