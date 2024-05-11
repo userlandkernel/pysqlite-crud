@@ -22,16 +22,21 @@ def generate_class_for_table(table_name, schema):
     class_definition += "        self.conn.commit()\n\n"
     
     # Read method
-    class_definition += f"    def read(self):\n"
-    class_definition += f"        self.cursor.execute(\"SELECT * FROM {table_name}\")\n"
+    class_definition += f"    def read(self, **filters):\n"
+    class_definition += "        query = f\"SELECT * FROM "+f"{table_name}"+f"\"\n"
+    class_definition += "        if filters:\n"
+    class_definition += "            filter_clauses = [f\"{column} = ?\" for column in filters]\n"
+    class_definition += "            query += \" WHERE \" + \" AND \".join(filter_clauses)\n"
+    class_definition += "        self.cursor.execute(query, tuple(filters.values()))\n"
     class_definition += "        return self.cursor.fetchall()\n\n"
     
     # Update method
-    update_columns = ', '.join([f"{col[1]} = ?" for col in schema[1:]])
-    class_definition += f"    def update(self, id, {columns}):\n"
-    class_definition += f"        self.cursor.execute(\"UPDATE {table_name} SET {update_columns} WHERE {schema[0][1]} = ?\", ({columns}, id))\n"
+    class_definition += "    def update(self, id, **updates):\n"
+    class_definition += "        update_clauses = ', '.join([f\"{column} = ?\" for column in updates])\n"
+    class_definition += "        values = list(updates.values()) + [id]\n"
+    class_definition += "        self.cursor.execute(f\"UPDATE "+f"{table_name}"+f" SET"+ "{update_clauses}"+f"WHERE {schema[0][1]} = ?\", values)\n"
     class_definition += "        self.conn.commit()\n\n"
-    
+
     # Delete method
     class_definition += f"    def delete(self, id):\n"
     class_definition += f"        self.cursor.execute(\"DELETE FROM {table_name} WHERE {schema[0][1]} = ?\", (id,))\n"
